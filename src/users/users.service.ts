@@ -35,8 +35,32 @@ export class UsersService {
     return this.usersRepository.save(updatedUser);
   }
 
-  async updateWithImage(file: Express.Multer.File) {
+  async updateWithImage(
+    file: Express.Multer.File,
+    id: number,
+    user: UpdateUserDto,
+  ) {
     const url = await storage(file, file.originalname);
     console.log('URL: ' + url);
+
+    if (url === undefined || url === null) {
+      return new HttpException(
+        '파일 업로드가 실패했습니다. 다시 시도해주세요.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    const userFound = await this.usersRepository.findOneBy({ id });
+
+    if (!userFound) {
+      return new HttpException(
+        '존재하지 않는 유저입니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    user.image = url;
+    const updatedUser = Object.assign(userFound, user);
+    return this.usersRepository.save(updatedUser);
   }
 }
