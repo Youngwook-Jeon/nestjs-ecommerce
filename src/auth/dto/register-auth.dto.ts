@@ -22,4 +22,6 @@ export class RegisterAuthDto {
   @IsString()
   @MinLength(8, { message: '비밀번호는 적어도 8자 이상이어야 합니다.' })
   password: string;
+
+  rolesIds: string[];
 }
