@@ -46,8 +46,13 @@ export class AuthService {
     newUser.roles = roles;
 
     const userSaved = await this.usersRepository.save(newUser);
+    const rolesString = userSaved.roles.map((role) => role.id);
 
-    const payload = { id: userSaved.id, name: userSaved.name };
+    const payload = {
+      id: userSaved.id,
+      name: userSaved.name,
+      roles: rolesString,
+    };
     const token = this.jwtService.sign(payload);
     const data = {
       user: userSaved,
@@ -61,7 +66,10 @@ export class AuthService {
 
   async login(loginData: LoginAuthDto) {
     const { email, password } = loginData;
-    const userFound = await this.usersRepository.findOneBy({ email });
+    const userFound = await this.usersRepository.findOne({
+      where: { email },
+      relations: ['roles'],
+    });
     if (!userFound) {
       return new HttpException(
         '가입된 메일주소가 아닙니다.',
@@ -77,7 +85,9 @@ export class AuthService {
       );
     }
 
-    const payload = { id: userFound.id, name: userFound.name };
+    const rolesIds = userFound.roles.map((role) => role.id);
+
+    const payload = { id: userFound.id, name: userFound.name, roles: rolesIds };
     const token = this.jwtService.sign(payload);
     const data = {
       user: userFound,

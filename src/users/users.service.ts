@@ -18,7 +18,7 @@ export class UsersService {
   }
 
   findAll() {
-    return this.usersRepository.find();
+    return this.usersRepository.find({ relations: ['roles'] });
   }
 
   async update(id: number, user: UpdateUserDto) {
