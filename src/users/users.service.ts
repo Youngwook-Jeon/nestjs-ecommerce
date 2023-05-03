@@ -25,7 +25,7 @@ export class UsersService {
     const userFound = await this.usersRepository.findOneBy({ id });
 
     if (!userFound) {
-      return new HttpException(
+      throw new HttpException(
         '존재하지 않는 유저입니다.',
         HttpStatus.NOT_FOUND,
       );
@@ -44,7 +44,7 @@ export class UsersService {
     console.log('URL: ' + url);
 
     if (url === undefined || url === null) {
-      return new HttpException(
+      throw new HttpException(
         '파일 업로드가 실패했습니다. 다시 시도해주세요.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -53,7 +53,7 @@ export class UsersService {
     const userFound = await this.usersRepository.findOneBy({ id });
 
     if (!userFound) {
-      return new HttpException(
+      throw new HttpException(
         '존재하지 않는 유저입니다.',
         HttpStatus.NOT_FOUND,
       );

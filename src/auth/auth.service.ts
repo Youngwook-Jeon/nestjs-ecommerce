@@ -23,7 +23,7 @@ export class AuthService {
     });
 
     if (emailExist) {
-      return new HttpException(
+      throw new HttpException(
         '이미 가입된 이메일 주소입니다.',
         HttpStatus.CONFLICT,
       );
@@ -33,15 +33,20 @@ export class AuthService {
     });
 
     if (phoneExist) {
-      return new HttpException(
+      throw new HttpException(
         '이미 가입된 전화번호입니다.',
         HttpStatus.CONFLICT,
       );
     }
 
     const newUser = this.usersRepository.create(user);
+    let rolesIds = [];
 
-    const rolesIds = user.rolesIds;
+    if (user.rolesIds !== undefined && user.rolesIds !== null) {
+      rolesIds = user.rolesIds;
+    } else {
+      rolesIds.push('CLIENT');
+    }
     const roles = await this.rolesRepository.findBy({ id: In(rolesIds) });
     newUser.roles = roles;
 
@@ -71,7 +76,7 @@ export class AuthService {
       relations: ['roles'],
     });
     if (!userFound) {
-      return new HttpException(
+      throw new HttpException(
         '가입된 메일주소가 아닙니다.',
         HttpStatus.NOT_FOUND,
       );
@@ -79,7 +84,7 @@ export class AuthService {
 
     const isPasswordValid = await compare(password, userFound.password);
     if (!isPasswordValid) {
-      return new HttpException(
+      throw new HttpException(
         '가입된 정보와 일치하지 않습니다.',
         HttpStatus.FORBIDDEN,
       );
